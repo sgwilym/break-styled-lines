@@ -1,0 +1,49 @@
+{
+  "name": "break-styled-lines",
+  "version": "1.0.0",
+  "description": "Add newlines to a string of text given a font style and width",
+  "main": "src/index.ts",
+  "author": "Sam Gwilym <gwilym@me.com>",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/preset-typescript": "^7.3.3",
+    "@pika/pack": "^0.5.0",
+    "@pika/plugin-build-web": "^0.6.0",
+    "@pika/plugin-ts-standard-pkg": "^0.6.0",
+    "@types/jest": "^24.0.18",
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
+    "babel-eslint": "^10.0.3",
+    "canvas": "^2.5.0",
+    "eslint": "^6.3.0",
+    "jest": "^24.9.0",
+    "typescript": "^3.5.3"
+  },
+  "scripts": {
+    "build": "pika build",
+    "test": "jest"
+  },
+  "@pika/pack": {
+    "pipeline": [
+      [
+        "@pika/plugin-ts-standard-pkg"
+      ],
+      [
+        "@pika/plugin-build-web"
+      ]
+    ]
+  },
+  "jest": {
+    "testEnvironment": "jest-environment-jsdom-fourteen"
+  },
+  "keywords": [
+    "newline",
+    "linebreak",
+    "visual",
+    "typeset",
+    "styled"
+  ]
+}
