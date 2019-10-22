@@ -1,10 +1,11 @@
 {
   "name": "break-styled-lines",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Add newlines to a string of text given a font style and width",
   "main": "src/index.ts",
   "author": "Sam Gwilym <gwilym@me.com>",
   "license": "MIT",
+  "repository": "https://github.com/sgwilym/break-styled-lines",
   "private": false,
   "devDependencies": {
     "@babel/core": "^7.5.5",
