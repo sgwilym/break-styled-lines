@@ -1,6 +1,6 @@
 {
   "name": "break-styled-lines",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Add newlines to a string of text given a font style and width",
   "main": "src/index.ts",
   "author": "Sam Gwilym <gwilym@me.com>",
