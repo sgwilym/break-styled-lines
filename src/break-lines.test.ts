@@ -28,4 +28,27 @@ What ails
 you on this
 day?`);
   });
+  it("breaks arrays of text", () => {
+    const brokenLines = breakLines(
+      [
+        "Having held the house for who knows how long",
+        "when at last trouble came along, ",
+        "their grasp was loosened almost instantly."
+      ],
+      100,
+      "10px Arial"
+    );
+
+    expect(brokenLines).toEqual([
+      `Having held the house
+for who knows how
+long`,
+      `when at last
+trouble came along,
+`,
+      `their grasp was
+loosened almost
+instantly.`
+    ]);
+  });
 });

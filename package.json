@@ -21,6 +21,7 @@
     "canvas": "^2.5.0",
     "eslint": "^6.3.0",
     "jest": "^24.9.0",
+    "jest-environment-jsdom-fourteen": "^0.1.0",
     "typescript": "^3.5.3"
   },
   "scripts": {
