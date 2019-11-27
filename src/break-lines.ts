@@ -63,34 +63,7 @@ function insertNewlineAtPosition(
     );
 }
 
-function insertNewLinesIntoStrings(
-  strings: string[],
-  width: number,
-  font: string
-): string[] {
-  const withNewLines = breakLines(strings.join(""), width, font);
-
-  /*
-    ['hello there ', 'my good friend, ', 'how are you today?']
-  + ['hello there my good\n friend, how are you\n today?']
-  = ['hello there ', 'my good\n friend, ', 'how are you\n today?']
-  */
-
-  const newLinePositions = withNewLines
-    .split("")
-    .reduce((positions: number[], char, i) => {
-      if (char === "\n") {
-        return [...positions, i];
-      }
-      return positions;
-    }, []);
-
-  return newLinePositions.reduce((result, position) => {
-    return insertNewlineAtPosition(position, result);
-  }, strings);
-}
-
-function breakLines(text: string, width: number, font: string): string {
+function breakLines<T extends string>(text: T, width: number, font: string): T {
   const supportsOffscreenCanvas = "OffscreenCanvas" in window;
 
   const canvasEl = document.createElement("canvas");
@@ -133,13 +106,15 @@ function breakLines(text: string, width: number, font: string): string {
       [[]]
     );
 
-    return brokenWords.map(line => line.join(" ")).join("\n");
+    return brokenWords.map(line => line.join(" ")).join("\n") as T;
   }
 
   console.warn("No canvas context was found, so the string was left as is!");
   return text;
 }
 
+function breakLinesEntry(text: string, width: number, font: string): string;
+function breakLinesEntry(text: string[], width: number, font: string): string[];
 /**
  * Breaks a string into lines given a width and style for the text.
  *
@@ -148,14 +123,33 @@ function breakLines(text: string, width: number, font: string): string {
  * @param font - The style of the text expressed as a value of the CSS font property, e.g. '12pt bold serif'
  * @returns The given string with newlines inserted
  */
-export default (
+function breakLinesEntry(
   text: string | string[],
   width: number,
   font: string
-): string | string[] => {
+): string | string[] {
   if (isArray(text)) {
-    return insertNewLinesIntoStrings(text, width, font);
+    /*
+      ['hello there ', 'my good friend, ', 'how are you today?']
+    + ['hello there my good\n friend, how are you\n today?']
+    = ['hello there ', 'my good\n friend, ', 'how are you\n today?']
+    */
+    const withNewLines = breakLines(text.join(""), width, font);
+    const newLinePositions = withNewLines
+      .split("")
+      .reduce((positions: number[], char, i) => {
+        if (char === "\n") {
+          return [...positions, i];
+        }
+        return positions;
+      }, []);
+
+    return newLinePositions.reduce((result, position) => {
+      return insertNewlineAtPosition(position, result) as string[];
+    }, text);
   }
 
   return breakLines(text, width, font);
-};
+}
+
+export default breakLinesEntry;
