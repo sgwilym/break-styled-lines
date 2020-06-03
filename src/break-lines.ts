@@ -37,30 +37,34 @@ function insertNewlineAtPosition(
     { indexToInsertInto: 0, localPosition: 0, lengthOfPreceding: 0 }
   );
 
-  return arrayOfStrings
-    .map((string, i) => {
-      if (i === indexToInsertInto) {
-        return (
-          string.slice(0, localPosition) + "\n" + string.slice(localPosition)
-        );
-      }
-
-      return string;
-    })
-    .map(string =>
-      string
-        .split("\n")
-        .map((str, i, strs) => {
-          if (i === 0 && strs.length > 1) {
-            return str.trimRight();
-          } else if (i === strs.length - 1) {
-            return str.trimLeft();
-          }
-
-          return str.trim();
-        })
-        .join("\n")
-    );
+  return (
+    arrayOfStrings
+      .map((string, i) => {
+        if (i === indexToInsertInto) {
+          return (
+            string.slice(0, localPosition) + "\n" + string.slice(localPosition)
+          );
+        }
+        return string;
+      })
+      // This is to remove whitespace adjacent to newlines, but to preserve starting or trailing whitespace
+      .map(string =>
+        string
+          .split("\n")
+          .map((str, i, strs) => {
+            if (i < strs.length - 2 && i > 0) {
+              return str.trim();
+            }
+            if (i < strs.length - 2) {
+              return str.trimRight();
+            } else if (i > 0) {
+              return str.trimLeft();
+            }
+            return str;
+          })
+          .join("\n")
+      )
+  );
 }
 
 function breakLines<T extends string>(text: T, width: number, font: string): T {
@@ -73,9 +77,9 @@ function breakLines<T extends string>(text: T, width: number, font: string): T {
     : canvasEl;
 
   canvas.width = width;
-  const ctx = canvas.getContext("2d") as (
+  const ctx = canvas.getContext("2d") as
     | CanvasRenderingContext2D
-    | OffscreenCanvasRenderingContext2D);
+    | OffscreenCanvasRenderingContext2D;
 
   if (ctx) {
     ctx.font = font;
