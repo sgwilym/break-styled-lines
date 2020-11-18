@@ -46,7 +46,7 @@ day? `);
       [
         "Having held the house for who knows how long",
         "when at last trouble came along,",
-        "their grasp was loosened almost instantly."
+        "their grasp was loosened almost instantly.",
       ],
       100,
       "10px Arial"
@@ -60,7 +60,7 @@ how long`,
 came along,`,
       `their grasp was
 loosened almost
-instantly.`
+instantly.`,
     ]);
   });
 
@@ -69,7 +69,7 @@ instantly.`
       [
         " Having held the house for who knows how long ",
         " when at last trouble came along, ",
-        " their grasp was loosened almost instantly. "
+        " their grasp was loosened almost instantly. ",
       ],
       100,
       "10px Arial"
@@ -83,20 +83,25 @@ how long `,
 came along, `,
       ` their grasp was
 loosened almost
-instantly. `
+instantly. `,
     ]);
   });
-  
+
   it("can break lines with variable font styles", () => {
     const brokenLines = breakLines(
-      [{text: "There once was an irrascible, fearsome,"}, {text: "HUNGRY BEASTIE", font: '36px Impact'}, {text: "and when all was said, that was that"}], 100, "10px Arial"
-    )
-    
+      [
+        { text: "There once was an irrascible, fearsome," },
+        { text: "HUNGRY BEASTIE", font: "36px Impact" },
+        { text: "and when all was said, that was that" },
+      ],
+      100,
+      "10px Arial"
+    );
+
     expect(brokenLines).toEqual([
-      'There once was an\nirrascible, fearsome,',
-      '\nHUNGRY\nBEASTIE',
-      '\nand when all was\nsaid, that was that'
-    ])
-    
-  })
+      "There once was an\nirrascible, fearsome,",
+      "\nHUNGRY\nBEASTIE",
+      "\nand when all was\nsaid, that was that",
+    ]);
+  });
 });
