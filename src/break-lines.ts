@@ -1,14 +1,108 @@
-type TextDescriptor = { text: string, font?: string }
+type TextDescriptor = { text: string; font?: string };
 
-function isStringArray(text: string | string[] | TextDescriptor[]): text is string[] {
-  return Array.isArray(text) && text.every((member: string | TextDescriptor) => typeof member === 'string');
+function isStringArray(
+  text: string | string[] | TextDescriptor[]
+): text is string[] {
+  return (
+    Array.isArray(text) &&
+    text.every((member: string | TextDescriptor) => typeof member === "string")
+  );
 }
 
-function isTextDescriptorArray(text: string | string[] | TextDescriptor[]): text is TextDescriptor[] {
-  return Array.isArray(text) && !isStringArray(text)
+function isTextDescriptorArray(
+  text: string | string[] | TextDescriptor[]
+): text is TextDescriptor[] {
+  return Array.isArray(text) && !isStringArray(text);
 }
 
-function breakLines(descriptors: {text: string, font: string}[], width: number): string[] {
+function withNewLines(
+  descriptor: { text: string; font: string },
+  width: Number,
+  startingX: number,
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+): { lastLineWidth: number; text: string } {
+  // Break up all the parts into whitespace and words
+  const elements = descriptor.text
+    .split("")
+    .reduce((elements: string[], char: string) => {
+      const runningElement = elements[elements.length - 1] || "";
+      const lastChar = runningElement.slice(-1);
+
+      if (char === " " && lastChar !== " ") {
+        return [...elements, char];
+      }
+
+      if (char !== " " && lastChar === " ") {
+        return [...elements, char];
+      }
+
+      return [...elements.slice(0, -1), `${runningElement}${char}`];
+    }, []);
+
+  const { lastLineWidth, lines } = elements.reduce(
+    (result, element: string) => {
+      ctx.font = descriptor.font;
+      const { width: elementWidth } = ctx.measureText(element);
+      const completeTextWidth = result.lastLineWidth + elementWidth;
+
+      const itFits = completeTextWidth <= width;
+
+      // If it fits, remove the last line from current results
+      // append the current element into it
+      // and insert it back in
+      if (itFits) {
+        const appendedLine = [...result.lines.slice(-1), element].join("");
+
+        return {
+          lastLineWidth: completeTextWidth,
+          lines: [...result.lines.slice(0, -1), appendedLine],
+        };
+      }
+
+      // Now it doesn't fit.
+
+      // If the element itself didn't fit on a line
+      // Then we should force a break
+      if (elementWidth > width && result.lastLineWidth === 0) {
+        return {
+          lastLineWidth: elementWidth,
+          lines: [...result.lines.slice(0, -1), element]
+        }
+      }
+
+      // Trim any whitespace at the end of the line
+      // which is being broken.
+      const previousLine = result.lines.slice(-1).join("");
+      const precedingLines = [
+        ...result.lines.slice(0, -1),
+        previousLine.trimEnd(),
+      ];
+
+      // If the element that doesn't fit is a whitespace
+      // we should just insert a newline
+      if (element.trim().length === 0) {
+        return {
+          lastLineWidth: 0,
+          lines: [...precedingLines, ""],
+        };
+      }
+
+      // Otherwise we should just start a new line with the element
+      return {
+        lastLineWidth: elementWidth,
+        lines: [...precedingLines, element],
+      };
+    },
+    { lastLineWidth: startingX, lines: [] as string[] }
+  );
+
+  return { lastLineWidth, text: lines.join("\n") };
+}
+
+function breakLines(
+  descriptors: { text: string; font: string }[],
+  width: number
+): string[] {
   const supportsOffscreenCanvas = "OffscreenCanvas" in window;
 
   const canvasEl = document.createElement("canvas");
@@ -23,68 +117,62 @@ function breakLines(descriptors: {text: string, font: string}[], width: number):
     | OffscreenCanvasRenderingContext2D;
 
   if (ctx) {
-    return descriptors.reduce((result, {text, font}, descIndex) => {
-      const lastLine = result[result.length - 1];
-      const lastLineSplit = lastLine ? lastLine.split('\n') : [];
-      const runningLine = lastLineSplit.length > 0 ? lastLineSplit[lastLineSplit.length - 1]: "";
-      const prevFont = descriptors[descIndex - 1] ? descriptors[descIndex - 1].font : font;
-      
-      const brokenWords = text.split(" ").reduce(
-        (accumulator: string[][], word: string, i) => {
-          // get the last element of the accumulator
-          const [lastLine] = accumulator.slice(-1);
-  
-          // add the word to it
-          const maybeNextLine = [...lastLine, word].join(" ");
-  
-          // see if it fits within the width
-          ctx.font = prevFont;
-          const { width: prevTextWidth } = ctx.measureText(runningLine);
-             
-          ctx.font = font
-          const { width: textWidth } = ctx.measureText(maybeNextLine);
-              
-          const totalWidth = i === 0 ? prevTextWidth + textWidth : textWidth
-  
-          // if it does, append to the last element
-          if (totalWidth <= width) {
-            return [...accumulator.slice(0, -1), [...lastLine, word]];
-          }
-          
-          // Handle case of the first word being too long for a line
-          if (totalWidth > width && i === 0 && runningLine === "") {
-            return [...accumulator.slice(0, -1), [...lastLine, word]];
-          }
-          
-          // if not, create a new array containing the word as the last element
-          return [...accumulator, [word]];
-        },
-        [[]]
-      );
-  
-      return [...result, brokenWords.map(line => line.join(" ")).join("\n")];
-    }, [] as string[])
+    return descriptors.reduce(
+      (result, descriptor) => {
+        const { lastLineWidth, text } = withNewLines(
+          descriptor,
+          width,
+          result.lastLineWidth,
+          ctx
+        );
+
+        return {
+          lastLineWidth,
+          lines: [...result.lines, text],
+        };
+      },
+      { lastLineWidth: 0, lines: [] as string[] }
+    ).lines;
   }
 
   console.warn("No canvas context was found, so the string was left as is!");
-  return descriptors.map(({text}) => text);
+  return descriptors.map(({ text }) => text);
 }
 
-function toTextDescriptors(text: string | string[] | TextDescriptor[], defaultFont: string): { text: string, font: string}[] {
+function toTextDescriptors(
+  text: string | string[] | TextDescriptor[],
+  defaultFont: string
+): { text: string; font: string }[] {
   if (isTextDescriptorArray(text)) {
-    return text.map(({text, font}) => ({text, font: font || defaultFont}));
+    return text.map(({ text, font }) => ({
+      text: stripNewlines(text),
+      font: font || defaultFont,
+    }));
   }
-  
+
   if (isStringArray(text)) {
-    return text.map((member) => ({text: member, font: defaultFont }))
+    return text.map((member) => ({
+      text: stripNewlines(member),
+      font: defaultFont,
+    }));
   }
-  
-  return [{text, font: defaultFont}]
+
+  return [{ text: stripNewlines(text), font: defaultFont }];
+}
+
+const newlineRegex = /(\r\n|\n|\r)/gm;
+
+function stripNewlines(text: string) {
+  return text.replace(newlineRegex, " ");
 }
 
 function breakLinesEntry(text: string, width: number, font: string): string;
 function breakLinesEntry(text: string[], width: number, font: string): string[];
-function breakLinesEntry(text: TextDescriptor[], width: number, font: string): string[];
+function breakLinesEntry(
+  text: TextDescriptor[],
+  width: number,
+  font: string
+): string[];
 /**
  * Breaks a string into lines given a width and style for the text.
  *
@@ -98,13 +186,12 @@ function breakLinesEntry(
   width: number,
   font: string
 ): string | string[] {
-  
   const descriptors = toTextDescriptors(text, font);
-  
+
   if (isStringArray(text)) {
-    return breakLines(descriptors, width);    
+    return breakLines(descriptors, width);
   }
-  
+
   if (isTextDescriptorArray(text)) {
     return breakLines(descriptors, width);
   }
