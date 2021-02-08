@@ -1,4 +1,4 @@
-import breakLines from "./break-lines";
+import breakLines from './break-lines';
 
 function widthOfText(text: string, width: number, style: string) {
   const canvas = document.createElement("canvas");
@@ -98,10 +98,10 @@ almost
 instantly.`,
     ]);
 
-
-// passes if join element is a newline.
-// 
-    expect(widthOfText(brokenLines.join(""), WIDTH, STYLE)).toBeLessThanOrEqual(WIDTH);
+    // passes if join element is a newline
+    expect(widthOfText(brokenLines.join(""), WIDTH, STYLE)).toBeLessThanOrEqual(
+      WIDTH
+    );
   });
 
   it("preserves whitespace on the ends of members", () => {
@@ -136,7 +136,9 @@ instantly.
 `,
     ]);
 
-    expect(widthOfText(brokenLines.join(""), WIDTH, STYLE)).toBeLessThanOrEqual(WIDTH);
+    expect(widthOfText(brokenLines.join(""), WIDTH, STYLE)).toBeLessThanOrEqual(
+      WIDTH
+    );
   });
 
   it("can break lines with variable font styles", () => {

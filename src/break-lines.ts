@@ -1,18 +1,29 @@
-type TextDescriptor = { text: string; font?: string };
+// Helper type, array of union types
+type Element<T> = T extends Array<infer U> ? U : never;
+
+// Helper function
+function elemT<T>(array: T): Array<Element<T>> {
+  return array as any;
+}
+
+export type TextDescriptor = { text: string; font?: string };
+
+function isTextDescriptorArray(
+  text: string | string[] | TextDescriptor[]
+): text is TextDescriptor[] {
+  return (
+    Array.isArray(text) &&
+    elemT(text).every((value) => value != null && typeof value === "object")
+  );
+}
 
 function isStringArray(
   text: string | string[] | TextDescriptor[]
 ): text is string[] {
   return (
     Array.isArray(text) &&
-    text.every((member: string | TextDescriptor) => typeof member === "string")
+    elemT(text).every((value) => typeof value === "string")
   );
-}
-
-function isTextDescriptorArray(
-  text: string | string[] | TextDescriptor[]
-): text is TextDescriptor[] {
-  return Array.isArray(text) && !isStringArray(text);
 }
 
 function withNewLines(
@@ -66,8 +77,8 @@ function withNewLines(
       if (elementWidth > width && result.lastLineWidth === 0) {
         return {
           lastLineWidth: elementWidth,
-          lines: [...result.lines.slice(0, -1), element]
-        }
+          lines: [...result.lines.slice(0, -1), element],
+        };
       }
 
       // Trim any whitespace at the end of the line
