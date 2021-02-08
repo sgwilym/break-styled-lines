@@ -1,15 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": { "*": ["types/*"] },
-    "target": "ES2019",
-    "module": "esnext",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "jsx": "react"
+    "strict": true
   },
   "include": ["src"],
-  "exclude": ["**/example.tsx", "**/*.test.ts", "**/*.test.tsx", "**/*.snap"]
+  "exclude": ["**/*.test.ts"]
 }
