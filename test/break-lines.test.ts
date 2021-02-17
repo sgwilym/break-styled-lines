@@ -1,4 +1,4 @@
-import breakLines from "./break-lines";
+import breakLines from "../src/break-lines";
 
 function widthOfText(text: string, width: number, style: string) {
   const canvas = document.createElement("canvas");
@@ -72,7 +72,7 @@ this day? `
       [
         "Having held the house for who knows how long",
         "when at last trouble came along,",
-        "their grasp was loosened almost instantly.",
+        "their grasp was loosened almost instantly."
       ],
       WIDTH,
       STYLE
@@ -95,13 +95,14 @@ their
 grasp was
 loosened
 almost
-instantly.`,
+instantly.`
     ]);
 
-
-// passes if join element is a newline.
-// 
-    expect(widthOfText(brokenLines.join(""), WIDTH, STYLE)).toBeLessThanOrEqual(WIDTH);
+    // passes if join element is a newline.
+    //
+    expect(widthOfText(brokenLines.join(""), WIDTH, STYLE)).toBeLessThanOrEqual(
+      WIDTH
+    );
   });
 
   it("preserves whitespace on the ends of members", () => {
@@ -109,7 +110,7 @@ instantly.`,
       [
         " Having held the house for who knows how long ",
         " when at last trouble came along, ",
-        " their grasp was loosened almost instantly. ",
+        " their grasp was loosened almost instantly. "
       ],
       WIDTH,
       STYLE
@@ -133,10 +134,12 @@ grasp was
 loosened
 almost
 instantly.
-`,
+`
     ]);
 
-    expect(widthOfText(brokenLines.join(""), WIDTH, STYLE)).toBeLessThanOrEqual(WIDTH);
+    expect(widthOfText(brokenLines.join(""), WIDTH, STYLE)).toBeLessThanOrEqual(
+      WIDTH
+    );
   });
 
   it("can break lines with variable font styles", () => {
@@ -144,7 +147,7 @@ instantly.
       [
         { text: "There once was an irrascible, fearsome," },
         { text: "HUNGRY BEASTIE", font: "36px Impact" },
-        { text: "and when all was said, that was that" },
+        { text: "and when all was said, that was that" }
       ],
       WIDTH,
       STYLE
@@ -153,7 +156,7 @@ instantly.
     expect(brokenLines).toEqual([
       "There once\nwas an\nirrascible,\nfearsome,",
       "\nHUNGRY\nBEASTIE",
-      "\nand when\nall was\nsaid, that\nwas that",
+      "\nand when\nall was\nsaid, that\nwas that"
     ]);
   });
 });

@@ -5,14 +5,14 @@ function isStringArray(
 ): text is string[] {
   return (
     Array.isArray(text) &&
-    text.every((member: string | TextDescriptor) => typeof member === "string")
+    (text.length > 0 ? typeof text[0] === "string" : true)
   );
 }
 
 function isTextDescriptorArray(
   text: string | string[] | TextDescriptor[]
 ): text is TextDescriptor[] {
-  return Array.isArray(text) && !isStringArray(text);
+  return Array.isArray(text) && (text.length > 0 ? !isStringArray(text) : true);
 }
 
 function withNewLines(
@@ -55,7 +55,7 @@ function withNewLines(
 
         return {
           lastLineWidth: completeTextWidth,
-          lines: [...result.lines.slice(0, -1), appendedLine],
+          lines: [...result.lines.slice(0, -1), appendedLine]
         };
       }
 
@@ -67,7 +67,7 @@ function withNewLines(
         return {
           lastLineWidth: elementWidth,
           lines: [...result.lines.slice(0, -1), element]
-        }
+        };
       }
 
       // Trim any whitespace at the end of the line
@@ -75,7 +75,7 @@ function withNewLines(
       const previousLine = result.lines.slice(-1).join("");
       const precedingLines = [
         ...result.lines.slice(0, -1),
-        previousLine.trimEnd(),
+        previousLine.trimEnd()
       ];
 
       // If the element that doesn't fit is a whitespace
@@ -83,14 +83,14 @@ function withNewLines(
       if (element.trim().length === 0) {
         return {
           lastLineWidth: 0,
-          lines: [...precedingLines, ""],
+          lines: [...precedingLines, ""]
         };
       }
 
       // Otherwise we should just start a new line with the element
       return {
         lastLineWidth: elementWidth,
-        lines: [...precedingLines, element],
+        lines: [...precedingLines, element]
       };
     },
     { lastLineWidth: startingX, lines: [] as string[] }
@@ -128,7 +128,7 @@ function breakLines(
 
         return {
           lastLineWidth,
-          lines: [...result.lines, text],
+          lines: [...result.lines, text]
         };
       },
       { lastLineWidth: 0, lines: [] as string[] }
@@ -146,14 +146,14 @@ function toTextDescriptors(
   if (isTextDescriptorArray(text)) {
     return text.map(({ text, font }) => ({
       text: stripNewlines(text),
-      font: font || defaultFont,
+      font: font || defaultFont
     }));
   }
 
   if (isStringArray(text)) {
-    return text.map((member) => ({
+    return text.map(member => ({
       text: stripNewlines(member),
-      font: defaultFont,
+      font: defaultFont
     }));
   }
 
