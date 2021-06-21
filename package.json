@@ -1,11 +1,23 @@
 {
+  "name": "break-styled-lines",
   "version": "1.2.2",
   "description": "Add newlines to a string of text given a font style and width",
   "author": "Sam Gwilym <gwilym@me.com>",
   "license": "MIT",
   "repository": "https://github.com/sgwilym/break-styled-lines",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "./dist/break-styled-lines.cjs",
+  "module": "./dist/break-styled-lines.js",
+  "types": "./dist/break-styled-lines.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/break-styled-lines.d.ts",
+      "node": {
+        "require": "./dist/break-styled-lines.cjs",
+        "import": "./dist/break-styled-lines.mjs"
+      },
+      "default": "./dist/break-styled-lines.js"
+    }
+  },
   "files": [
     "dist",
     "src"
@@ -14,22 +26,11 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
+    "prepare": "yarn build-types && yarn build",
+    "build-types": "dts-bundle-generator -o ./dist/break-styled-lines.d.ts src/index.ts",
+    "build": "node ./scripts/build.mjs && yarn build-types",
+    "test": "jest"
   },
-  "peerDependencies": {},
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "name": "break-styled-lines",
-  "module": "dist/break-styled-lines.esm.js",
   "size-limit": [
     {
       "path": "dist/break-styled-lines.cjs.production.min.js",
@@ -43,11 +44,10 @@
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.9.2",
     "canvas": "^2.6.1",
-    "husky": "^5.0.9",
-    "size-limit": "^4.9.2",
-    "ts-jest": "^26.5.1",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.1.0",
+    "dts-bundle-generator": "^5.9.0",
+    "esbuild": "^0.12.1",
+    "jest": "^27.0.4",
+    "ts-jest": "^27.0.3",
     "typescript": "^4.1.5"
   }
 }
