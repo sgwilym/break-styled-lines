@@ -159,4 +159,14 @@ instantly.
       "\nand when\nall was\nsaid, that\nwas that"
     ]);
   });
+  
+  it('warns when BlinkMacSystemFont is used', () => {
+    let warnings: string[] = [];
+    console.warn = (warning: string) => warnings.push(warning)
+    
+    
+     breakLines("Hello there.", 200, '16px system-ui, BlinkMacSystemFont, Helvetica');
+    
+    expect(warnings[0]).toBe("break-styled-lines: Using BlinkMacSystemFont can cause Chrome to crash in certain environments!")
+  })
 });

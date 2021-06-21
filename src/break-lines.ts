@@ -1,5 +1,13 @@
 type TextDescriptor = { text: string; font?: string };
 
+function checkFontForBlinkMacSystemFont(font: string): void {
+  if (font.includes("BlinkMacSystemFont")) {
+    console.warn(
+      "break-styled-lines: Using BlinkMacSystemFont can cause Chrome to crash in certain environments!"
+    );
+  }
+}
+
 function isStringArray(
   text: string | string[] | TextDescriptor[]
 ): text is string[] {
@@ -55,7 +63,7 @@ function withNewLines(
 
         return {
           lastLineWidth: completeTextWidth,
-          lines: [...result.lines.slice(0, -1), appendedLine]
+          lines: [...result.lines.slice(0, -1), appendedLine],
         };
       }
 
@@ -66,7 +74,7 @@ function withNewLines(
       if (elementWidth > width && result.lastLineWidth === 0) {
         return {
           lastLineWidth: elementWidth,
-          lines: [...result.lines.slice(0, -1), element]
+          lines: [...result.lines.slice(0, -1), element],
         };
       }
 
@@ -75,7 +83,7 @@ function withNewLines(
       const previousLine = result.lines.slice(-1).join("");
       const precedingLines = [
         ...result.lines.slice(0, -1),
-        previousLine.trimEnd()
+        previousLine.trimEnd(),
       ];
 
       // If the element that doesn't fit is a whitespace
@@ -83,14 +91,14 @@ function withNewLines(
       if (element.trim().length === 0) {
         return {
           lastLineWidth: 0,
-          lines: [...precedingLines, ""]
+          lines: [...precedingLines, ""],
         };
       }
 
       // Otherwise we should just start a new line with the element
       return {
         lastLineWidth: elementWidth,
-        lines: [...precedingLines, element]
+        lines: [...precedingLines, element],
       };
     },
     { lastLineWidth: startingX, lines: [] as string[] }
@@ -128,7 +136,7 @@ function breakLines(
 
         return {
           lastLineWidth,
-          lines: [...result.lines, text]
+          lines: [...result.lines, text],
         };
       },
       { lastLineWidth: 0, lines: [] as string[] }
@@ -146,14 +154,14 @@ function toTextDescriptors(
   if (isTextDescriptorArray(text)) {
     return text.map(({ text, font }) => ({
       text: stripNewlines(text),
-      font: font || defaultFont
+      font: font || defaultFont,
     }));
   }
 
   if (isStringArray(text)) {
-    return text.map(member => ({
+    return text.map((member) => ({
       text: stripNewlines(member),
-      font: defaultFont
+      font: defaultFont,
     }));
   }
 
@@ -186,6 +194,8 @@ function breakLinesEntry(
   width: number,
   font: string
 ): string | string[] {
+  checkFontForBlinkMacSystemFont(font);
+
   const descriptors = toTextDescriptors(text, font);
 
   if (isStringArray(text)) {
